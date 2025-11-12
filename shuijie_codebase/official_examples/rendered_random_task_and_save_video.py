@@ -15,4 +15,5 @@ env = create_env(
 info = run_random_rollouts(
     env, num_rollouts=3, num_steps=100, video_path="/tmp/test.mp4"
 )
+
 print(info)
