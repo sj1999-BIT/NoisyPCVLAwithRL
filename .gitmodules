@@ -4,3 +4,6 @@
 [submodule "robocasa"]
 	path = robocasa
 	url = https://github.com/robocasa/robocasa
+[submodule "openpi"]
+	path = openpi
+	url = git@github.com:Physical-Intelligence/openpi.git

@@ -16,7 +16,7 @@ shuijie_codebase/tmp/
 # Git will still track the submodule reference but not its untracked content
 
 # OpenPI (appears to be another external repo)
-openpi/
+# openpi/
 
 # PDF documentation (if you don't want to track it)
 shuijie_codebase/DROID.pdf
