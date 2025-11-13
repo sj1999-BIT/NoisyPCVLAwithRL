@@ -7,3 +7,6 @@
 [submodule "openpi"]
 	path = openpi
 	url = git@github.com:Physical-Intelligence/openpi.git
+[submodule "RLinf"]
+	path = RLinf
+	url = git@github.com:RLinf/RLinf.git
