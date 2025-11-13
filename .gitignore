@@ -1,6 +1,7 @@
 # Large data directories - exclude from tracking
 shuijie_codebase/droid_100/
 shuijie_codebase/model_weights/
+shuijie_code/miscellaneous_code/
 
 # Python cache
 shuijie_codebase/__pycache__/
