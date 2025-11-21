@@ -53,27 +53,3 @@ for episode in ds.take(1):
         print("\n\n compare with original action ", step["action_dict"])
 
 
-        # print(f"{instruction.numpy().decode('utf-8')}: action {action.numpy()}")
-        # print()
-        # print()
-        # cv2.imshow(wrist_image.numpy())
-
-# obs = droid_policy.make_droid_example()
-
-# for key, arr in obs.items():
-#     print(f"{key}: {arr}")
-
-# model = pytorch_model()
-
-# for filename in tqdm(sorted(os.listdir("./tmp"))):
-#     # Load
-#     with open(f'./tmp/{filename}', 'rb') as f:
-#         loaded = pickle.load(f)
-#         # print(model.get_pi05_action(loaded))
-#         print("Actions shape:", model.get_pi05_action(loaded)["actions"].shape)
-#         # print("Actions shape:", policy.infer(loaded)["actions"].shape)
-#         print("="*50)
-
-# Delete the policy to free up memory.
-# del policy
-

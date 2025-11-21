@@ -10,3 +10,9 @@
 [submodule "RLinf"]
 	path = RLinf
 	url = git@github.com:RLinf/RLinf.git
+[submodule "vggt"]
+	path = vggt
+	url = git@github.com:facebookresearch/vggt.git
+[submodule "LIBERO"]
+	path = LIBERO
+	url = https://github.com/Lifelong-Robot-Learning/LIBERO.git
