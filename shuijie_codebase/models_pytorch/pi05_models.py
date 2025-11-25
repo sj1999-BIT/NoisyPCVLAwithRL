@@ -20,7 +20,9 @@ import jax.numpy as jnp
 
 from abc import ABC, abstractmethod
 from .pi0_pytorch import PI0Pytorch
+from combine_vggt_pi05 import PI0_vggt_pytorch
 
+from pointCloud_utils import run_vggt_model, load_vggt_model, filter_points_by_confidence, SimplePointCloudEmbedder
 
 class pi05_model(ABC):
     def __init__(self, 
@@ -60,8 +62,7 @@ class pi05_model(ABC):
         ])
 
         
-
-    
+   
     @abstractmethod
     def get_pi05_action(self, obs):
         pass
@@ -124,22 +125,46 @@ class jax_model(pi05_model):
         return outputs
     
 class pytorch_model(pi05_model):
-    def __init__(self, checkpoint_dir, config, weights_filename = "model.safetensors"):
+    def __init__(self, checkpoint_dir, config, weights_filename = "model.safetensors", pc_conf_thres=0.9):
         super().__init__(
             config,
             checkpoint_dir
             )
-        self.model = PI0Pytorch(config=self.config.model)
+        self.model = PI0_vggt_pytorch(config=self.config.model)
         # self.model.load_state_dict(safetensors.torch.load_file(weight_path))
-        safetensors.torch.load_model(self.model, os.path.join(checkpoint_dir, weights_filename))
+        # safetensors.torch.load_model(self.model, os.path.join(checkpoint_dir, weights_filename))
+
+        state_dict = safetensors.torch.load_file(os.path.join(checkpoint_dir, weights_filename))
+        
+        # Load with strict=False
+        missing_keys, unexpected_keys = self.model.load_state_dict(state_dict, strict=False)
+        # safetensors.torch.load_model(self, checkpoint_path)
+        
+        # print(f"Loaded pretrained weights. Missing keys: {len(missing_keys)}")
+
+        if len(missing_keys) > 0:
+            for name in missing_keys:
+                print(name)
         
         self.model.paligemma_with_expert.to_bfloat16_for_selected_params("bfloat16")
         self.pytorch_device='cuda:0'
         self.model = self.model.to(self.pytorch_device)
         self.model.eval()
 
+
+        self.pc_generator = load_vggt_model().to(self.pytorch_device)
+        self.pc_conf_thres = pc_conf_thres
+
     def get_pi05_action(self, obs):
         with torch.no_grad():
+            
+            img_input_list = [obs['observation/image'], obs['observation/wrist_image']]
+            predictions = run_vggt_model(self.pc_generator, img_input_list)
+
+            filtered_pointCloud_vertices, filtered_pointCloud_rgb =  filter_points_by_confidence(predictions, conf_thres=self.pc_conf_thres)
+
+            pc_tensor = torch.from_numpy(filtered_pointCloud_vertices).to(self.pytorch_device)
+
             inputs = jax.tree.map(lambda x: x, obs)
             inputs = self.input_transform(inputs)
             inputs = jax.tree.map(lambda x: torch.from_numpy(np.array(x)).to(self.pytorch_device)[None, ...], inputs)
@@ -152,7 +177,7 @@ class pytorch_model(pi05_model):
             start_time = time.monotonic()
             outputs = {
                 "state": inputs["state"],
-                "actions": self.model.sample_actions(sample_rng_or_pytorch_device, observation, **self.sample_kwargs),
+                "actions": self.model.sample_actions(sample_rng_or_pytorch_device, observation, pc_tensor,  **self.sample_kwargs),
             }
             model_time = time.monotonic() - start_time
 

@@ -265,17 +265,17 @@ def run_vggt_model(model, input_image_list):
     model_input = load_and_preprocess_images(input_image_list).to(device)
 
     # Run inference
-    print("Running inference...")
+    # print("Running inference...")
     dtype = torch.bfloat16 if torch.cuda.get_device_capability()[0] >= 8 else torch.float16
 
     with torch.no_grad():
         with torch.cuda.amp.autocast(dtype=dtype):
             predictions = model(model_input)
 
-    print("model predictions", predictions.keys())
+    # print("model predictions", predictions.keys())
 
     # Convert pose encoding to extrinsic and intrinsic matrices
-    print("Converting pose encoding to extrinsic and intrinsic matrices...")
+    # print("Converting pose encoding to extrinsic and intrinsic matrices...")
     extrinsic, intrinsic = pose_encoding_to_extri_intri(predictions["pose_enc"], model_input.shape[-2:])
     predictions["extrinsic"] = extrinsic
     predictions["intrinsic"] = intrinsic
@@ -287,7 +287,7 @@ def run_vggt_model(model, input_image_list):
     predictions['pose_enc_list'] = None  # remove pose_enc_list
 
     # Generate world points from depth map
-    print("Computing world points from depth map...")
+    # print("Computing world points from depth map...")
     depth_map = predictions["depth"]  # (S, H, W, 1)
     world_points = unproject_depth_map_to_point_map(depth_map, predictions["extrinsic"], predictions["intrinsic"])
     predictions["world_points_from_depth"] = world_points

@@ -249,14 +249,14 @@ class PI05Client:
         except Exception as e:
             raise Exception(f"Error getting action: {str(e)}")
     
-    def check_model_performance(self, time_step=100):
+    def check_model_performance(self, time_step=100, time_out=100):
         """Check if server model performance."""
         try:
             response = requests.post(
                 f"{self.server_url}/perform",
                 json={"timesteps": time_step},
                 headers={"Content-Type": "application/json"},
-                timeout=100
+                timeout=time_out
             )
             
             if response.status_code == 200:
@@ -555,6 +555,10 @@ def run_robocasa_trajectory(client, model_type, current_prompt="pick up vegetabl
 def run_libero_trajectory(client, model_type, current_prompt, video_path="./tmp/demo.mp4"):
 
     sys.path.append('../LIBERO')
+
+    # import os
+    os.environ['PYOPENGL_PLATFORM'] = 'egl'
+    os.environ['MUJOCO_GL'] = 'egl'
     
     # sys.path.append('../robosuite')
 
@@ -600,10 +604,8 @@ def run_libero_trajectory(client, model_type, current_prompt, video_path="./tmp/
 
     for step in tqdm(range(100), desc="running libero dataset"):
         
-        
-
-        formatted_observation['observation/image'] = np.flip(obs['agentview_image'], 0)
-        formatted_observation['observation/wrist_image'] = np.flip(obs['robot0_eye_in_hand_image'], 0)
+        formatted_observation['observation/image'] = np.flip(np.flip(obs['agentview_image'], 0), 1)
+        formatted_observation['observation/wrist_image'] = np.flip(np.flip(obs['robot0_eye_in_hand_image'], 0), 1)
         formatted_observation['observation/state'] = np.concatenate([obs["robot0_joint_pos"], obs["robot0_gripper_qpos"]])
         formatted_observation['prompt'] = current_prompt
 
@@ -628,5 +630,5 @@ def run_libero_trajectory(client, model_type, current_prompt, video_path="./tmp/
 
 if __name__ == "__main__":
     client = PI05ClientWithRetry(max_retries=3)
-    # client.check_model_performance(time_step=100)
+    client.check_model_performance(time_step=1, time_out=500)
     run_libero_trajectory(client, model_type="libero", current_prompt="put both the alphabet soup and the tomato sauce in the basket")

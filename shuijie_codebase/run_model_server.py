@@ -20,6 +20,7 @@ import time
 from tqdm import tqdm
 from PIL import Image
 from models_pytorch.pi05_models import pytorch_model
+from combine_vggt_pi05 import PI0_vggt_pytorch
 
 from openpi.policies.libero_policy import make_libero_example
 
@@ -28,7 +29,10 @@ app = Flask(__name__)
 # Initialize model globally
 print("Loading PI0.5 model...")
 # model = pytorch_model()
+# model = pytorch_model(config="pi05_libero", checkpoint_dir="./models_pytorch/model_weights/pi05_vggt_libero_torch")
+
 model = pytorch_model(config="pi05_libero", checkpoint_dir="./models_pytorch/model_weights/pi05_libero_torch")
+# model = PI0_vggt_pytorch(config="pi05_libero", checkpoint_dir="./models_pytorch/model_weights/pi05_libero_torch")
 
 print("Model loaded successfully!")
 
@@ -82,8 +86,8 @@ def prepare_libero_input(data):
     
     # Return in internal DROID format for model
     model_input = {
-        'observation/image': torch.from_numpy(exterior_image),
-        'observation/wrist_image': torch.from_numpy(wrist_image),
+        'observation/image': exterior_image,
+        'observation/wrist_image': wrist_image,
         'observation/state': torch.from_numpy(state),
         'prompt': prompt
     }
