@@ -482,9 +482,9 @@ class PI0_vggt_pytorch(nn.Module):
 
         prefix_embs, prefix_pad_masks, prefix_att_masks = self.embed_prefix(pc_tensor, images, img_masks, lang_tokens, lang_masks)
 
-        # print(f"debug: prefix_embs shape:{prefix_embs.shape}") #  prefix_embs shape:torch.Size([1, 968, 2048])
-        # print(f"debug: prefix_pad_masks shape:{prefix_pad_masks.shape}") # prefix_pad_masks shape:torch.Size([1, 968])
-        # print(f"debug: prefix_att_masks shape:{len(prefix_att_masks)}") # prefix_att_masks shape:1
+        print(f"debug: prefix_embs shape:{prefix_embs.shape}") #  prefix_embs shape:torch.Size([1, 968, 2048])
+        print(f"debug: prefix_pad_masks shape:{prefix_pad_masks.shape}") # prefix_pad_masks shape:torch.Size([1, 968])
+        print(f"debug: prefix_att_masks shape:{len(prefix_att_masks)}") # prefix_att_masks shape:1
 
         prefix_att_2d_masks = make_att_2d_masks(prefix_pad_masks, prefix_att_masks)
         prefix_position_ids = torch.cumsum(prefix_pad_masks, dim=1) - 1

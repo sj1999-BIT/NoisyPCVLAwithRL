@@ -86,8 +86,8 @@ def prepare_libero_input(data):
     
     # Return in internal DROID format for model
     model_input = {
-        'observation/image': exterior_image,
-        'observation/wrist_image': wrist_image,
+        'observation/image': torch.from_numpy(exterior_image),
+        'observation/wrist_image': torch.from_numpy(wrist_image),
         'observation/state': torch.from_numpy(state),
         'prompt': prompt
     }

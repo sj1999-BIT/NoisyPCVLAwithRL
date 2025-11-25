@@ -157,8 +157,12 @@ class pytorch_model(pi05_model):
 
     def get_pi05_action(self, obs):
         with torch.no_grad():
-            
-            img_input_list = [obs['observation/image'], obs['observation/wrist_image']]
+            if isinstance(obs['observation/image'], np.ndarray) and isinstance(obs['observation/wrist_image'], np.ndarray):
+                img_input_list = [obs['observation/image'], obs['observation/wrist_image']]
+            else:
+                img_input_list = [obs['observation/image'].numpy(), obs['observation/wrist_image'].numpy()]
+
+
             predictions = run_vggt_model(self.pc_generator, img_input_list)
 
             filtered_pointCloud_vertices, filtered_pointCloud_rgb =  filter_points_by_confidence(predictions, conf_thres=self.pc_conf_thres)

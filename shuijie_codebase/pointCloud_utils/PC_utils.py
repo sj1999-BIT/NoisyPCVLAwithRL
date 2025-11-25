@@ -269,7 +269,7 @@ def run_vggt_model(model, input_image_list):
     dtype = torch.bfloat16 if torch.cuda.get_device_capability()[0] >= 8 else torch.float16
 
     with torch.no_grad():
-        with torch.cuda.amp.autocast(dtype=dtype):
+        with torch.amp.autocast('cuda', dtype=dtype):
             predictions = model(model_input)
 
     # print("model predictions", predictions.keys())
